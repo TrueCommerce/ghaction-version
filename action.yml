@@ -1,0 +1,44 @@
+name: Version
+author: TrueCommerce
+description: A composite GitHub action used to calculate the next (or current in the case of releases) SemVer version number during a build.
+outputs:
+  semver:
+    description: "Format: {major}.{minor}.{patch}-{branch}.{commits}.{hash}"
+    value: ${{ steps.version.outputs.value }}
+  semverMajor:
+    description: "Format: {major}"
+    value: ${{ steps.semver-utils.outputs.major }}
+  semverMajorMinor:
+    description: "Format: {major}.{minor}"
+    value: "${{ steps.semver-utils.outputs.major }}.${{ steps.semver-utils.outputs.minor }}"
+  semverMajorMinorPatch:
+    description: "Format: {major}.{minor}.{patch}"
+    value: "${{ steps.semver-utils.outputs.major }}.${{ steps.semver-utils.outputs.minor }}.${{ steps.semver-utils.outputs.patch }}"
+runs:
+  using: "composite"
+  steps:
+    - if: github.event_name != 'release'
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.head_ref }}
+        fetch-depth: 0
+      
+    - if: github.event_name != 'release'
+      id: git-version
+      uses: codacy/git-version@2.5.4
+      with:
+        release-branch: master
+        major-identifier: '/semver:\s*(major|breaking)/'
+        minor-identifier: '/semver:\s*(minor|feature)/'
+
+    - id: version
+      uses: haya14busa/action-cond@v1.0.0
+      with:
+        cond: ${{ github.event_name == 'release' }}
+        if_true: ${{ github.ref_name }}
+        if_false: ${{ steps.git-version.outputs.version }}
+
+    - id: semver-utils
+      uses: madhead/semver-utils@latest
+      with:
+        version: ${{ steps.version.outputs.value }}
