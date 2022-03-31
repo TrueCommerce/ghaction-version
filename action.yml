@@ -5,6 +5,9 @@ outputs:
   semver:
     description: "Format: {major}.{minor}.{patch}-{branch}.{commits}.{hash}"
     value: ${{ steps.version.outputs.value }}
+  semverWithBuildMetadata:
+    description: "Format: {major}.{minor}.{patch}-{branch}.{commits}.{hash}+{metadata}"
+    value: "${{ steps.version.outputs.value }}+${{ steps.metadata.outputs.value }}"
   semverMajor:
     description: "Format: {major}"
     value: ${{ steps.semver-utils.outputs.major }}
@@ -42,3 +45,8 @@ runs:
       uses: madhead/semver-utils@latest
       with:
         version: ${{ steps.version.outputs.value }}
+        
+    - id: metadata
+      uses: actions/github-script@v5.0.0
+      script: |
+        core.setOutput("value", context.runNumber.toString().padStart(4, 0));
