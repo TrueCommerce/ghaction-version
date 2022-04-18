@@ -1,6 +1,11 @@
 name: Version
 author: TrueCommerce
 description: A composite GitHub action used to calculate the next (or current in the case of releases) SemVer version number during a build.
+inputs:
+  release-branch:
+    description: "The branch where release tags are added. Usually main or master. Default is master."
+    required: false
+    default: master
 outputs:
   semver:
     description: "Format: {major}.{minor}.{patch}-{branch}.{commits}.{hash}"
@@ -30,7 +35,7 @@ runs:
       id: git-version
       uses: codacy/git-version@2.5.4
       with:
-        release-branch: master
+        release-branch: ${{ inputs.release-branch }}
         major-identifier: '/semver:\s*(major|breaking)/'
         minor-identifier: '/semver:\s*(minor|feature)/'
 
