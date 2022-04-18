@@ -40,7 +40,7 @@ runs:
         minor-identifier: '/semver:\s*(minor|feature)/'
 
     - id: version
-      uses: haya14busa/action-cond@v1.0.0
+      uses: haya14busa/action-cond@v1.1.0
       with:
         cond: ${{ github.event_name == 'release' }}
         if_true: ${{ github.ref_name }}
